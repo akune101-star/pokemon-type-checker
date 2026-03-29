@@ -1,25 +1,25 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 
-// タイプデータ（日英両対応）
+// タイプデータ（参考画像のカラーに合わせて調整）
 const TYPES = {
-  normal: { ja: 'ノーマル', en: 'Normal', color: '#A8A878' },
-  fire: { ja: 'ほのお', en: 'Fire', color: '#F08030' },
-  water: { ja: 'みず', en: 'Water', color: '#6890F0' },
-  electric: { ja: 'でんき', en: 'Electric', color: '#F8D030' },
-  grass: { ja: 'くさ', en: 'Grass', color: '#78C850' },
-  ice: { ja: 'こおり', en: 'Ice', color: '#98D8D8' },
-  fighting: { ja: 'かくとう', en: 'Fighting', color: '#C03028' },
-  poison: { ja: 'どく', en: 'Poison', color: '#A040A0' },
-  ground: { ja: 'じめん', en: 'Ground', color: '#E0C068' },
-  flying: { ja: 'ひこう', en: 'Flying', color: '#A890F0' },
-  psychic: { ja: 'エスパー', en: 'Psychic', color: '#F85888' },
-  bug: { ja: 'むし', en: 'Bug', color: '#A8B820' },
-  rock: { ja: 'いわ', en: 'Rock', color: '#B8A038' },
-  ghost: { ja: 'ゴースト', en: 'Ghost', color: '#705898' },
-  dragon: { ja: 'ドラゴン', en: 'Dragon', color: '#7038F8' },
-  dark: { ja: 'あく', en: 'Dark', color: '#705848' },
-  steel: { ja: 'はがね', en: 'Steel', color: '#B8B8D0' },
-  fairy: { ja: 'フェアリー', en: 'Fairy', color: '#EE99AC' },
+  normal: { ja: 'ノーマル', en: 'Normal', color: '#8a8a9a' },
+  fire: { ja: 'ほのお', en: 'Fire', color: '#e85040' },
+  water: { ja: 'みず', en: 'Water', color: '#4a90d8' },
+  electric: { ja: 'でんき', en: 'Electric', color: '#f8c830' },
+  grass: { ja: 'くさ', en: 'Grass', color: '#62b840' },
+  ice: { ja: 'こおり', en: 'Ice', color: '#70d0d0' },
+  fighting: { ja: 'かくとう', en: 'Fighting', color: '#e87830' },
+  poison: { ja: 'どく', en: 'Poison', color: '#905898' },
+  ground: { ja: 'じめん', en: 'Ground', color: '#a87020' },
+  flying: { ja: 'ひこう', en: 'Flying', color: '#6880e0' },
+  psychic: { ja: 'エスパー', en: 'Psychic', color: '#e85080' },
+  bug: { ja: 'むし', en: 'Bug', color: '#90a820' },
+  rock: { ja: 'いわ', en: 'Rock', color: '#a0a0b0' },
+  ghost: { ja: 'ゴースト', en: 'Ghost', color: '#6060a0' },
+  dragon: { ja: 'ドラゴン', en: 'Dragon', color: '#5868d8' },
+  dark: { ja: 'あく', en: 'Dark', color: '#504050' },
+  steel: { ja: 'はがね', en: 'Steel', color: '#60a0b0' },
+  fairy: { ja: 'フェアリー', en: 'Fairy', color: '#e080d0' },
 };
 
 const TYPE_KEYS = Object.keys(TYPES);
@@ -60,69 +60,106 @@ const getMultiplierLabel = (multiplier, lang) => {
   return `×${multiplier}`;
 };
 
+// 斜めカットのタイプボタン
 const TypeButton = ({ type, selected, onClick, lang, size = 'normal' }) => {
   const data = TYPES[type];
-  const isLight = ['electric', 'ice', 'normal', 'steel', 'fairy', 'ground'].includes(type);
+  const height = size === 'small' ? '30px' : '36px';
+  const fontSize = size === 'small' ? '11px' : '13px';
+  const cutWidth = size === 'small' ? '14px' : '18px';
   
   return (
     <button
       onClick={() => onClick(type)}
       className={`
-        ${size === 'small' ? 'px-2 py-1 text-xs' : 'px-3 py-1.5 text-sm'}
-        rounded-full font-bold transition-all duration-200
+        relative flex items-center overflow-hidden rounded-md transition-all duration-200
         ${selected 
-          ? 'ring-2 ring-offset-2 ring-white dark:ring-offset-gray-900 scale-105 shadow-lg' 
-          : 'opacity-70 hover:opacity-100 hover:scale-105'
+          ? 'ring-2 ring-blue-400 ring-offset-2 ring-offset-gray-900 scale-105' 
+          : 'opacity-85 hover:opacity-100 hover:scale-102'
         }
       `}
       style={{ 
-        backgroundColor: data.color,
-        color: isLight ? '#333' : '#fff'
+        height,
+        backgroundColor: '#4a5568',
       }}
     >
-      {lang === 'ja' ? data.ja : data.en}
+      <div 
+        style={{
+          width: cutWidth,
+          height: '100%',
+          background: `linear-gradient(135deg, ${data.color} 50%, transparent 50%)`,
+          flexShrink: 0,
+        }}
+      />
+      <span 
+        style={{ 
+          color: 'white', 
+          fontSize,
+          fontWeight: 500,
+          padding: size === 'small' ? '0 10px 0 6px' : '0 12px 0 8px',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {lang === 'ja' ? data.ja : data.en}
+      </span>
     </button>
   );
 };
 
-const ResultSection = ({ title, types, multiplier, lang, isDark }) => {
+// 結果用のタイプバッジ
+const TypeBadge = ({ type, lang }) => {
+  const data = TYPES[type];
+  return (
+    <span
+      className="inline-flex items-center rounded overflow-hidden"
+      style={{ backgroundColor: '#4a5568', height: '24px' }}
+    >
+      <div 
+        style={{
+          width: '10px',
+          height: '100%',
+          background: `linear-gradient(135deg, ${data.color} 50%, transparent 50%)`,
+          flexShrink: 0,
+        }}
+      />
+      <span 
+        style={{ 
+          color: 'white', 
+          fontSize: '11px',
+          fontWeight: 500,
+          padding: '0 8px 0 5px',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {lang === 'ja' ? data.ja : data.en}
+      </span>
+    </span>
+  );
+};
+
+// 結果セクション
+const ResultSection = ({ title, types, multiplier, lang }) => {
   if (types.length === 0) return null;
   
-  const bgColor = multiplier === 0 ? 'bg-gray-600' 
-    : multiplier < 1 ? 'bg-blue-600' 
-    : multiplier === 2 ? 'bg-green-600' 
-    : 'bg-red-600';
+  const colorClass = multiplier === 0 ? 'text-gray-400 border-gray-600' 
+    : multiplier < 1 ? 'text-blue-400 border-blue-500' 
+    : multiplier === 2 ? 'text-green-400 border-green-500' 
+    : 'text-red-400 border-red-500';
 
   return (
-    <div className="mb-4">
-      <h3 className={`text-sm font-bold mb-2 ${
-        multiplier === 0 ? 'text-gray-400' :
-        multiplier < 1 ? 'text-blue-400' :
-        multiplier === 2 ? 'text-green-400' :
-        'text-red-400'
-      }`}>
+    <div className="mb-5">
+      <h3 className={`text-sm font-bold mb-3 ${colorClass.split(' ')[0]}`}>
         {getMultiplierLabel(multiplier, lang)} {title}
       </h3>
-      <div className="flex flex-wrap gap-2">
-        {types.map((typeArr, i) => (
-          <div
-            key={i}
-            className={`${bgColor} rounded-lg px-3 py-2 flex items-center gap-1`}
-          >
-            {typeArr.map((type, j) => (
-              <span
-                key={type}
-                className="px-2 py-0.5 rounded text-xs font-bold"
-                style={{
-                  backgroundColor: TYPES[type].color,
-                  color: ['electric', 'ice', 'normal', 'steel', 'fairy', 'ground'].includes(type) ? '#333' : '#fff'
-                }}
-              >
-                {lang === 'ja' ? TYPES[type].ja : TYPES[type].en}
-              </span>
-            ))}
-          </div>
-        ))}
+      <div className={`border-l-2 ${colorClass.split(' ')[1]} pl-4`}>
+        <div className="flex flex-wrap gap-2">
+          {types.map((typeArr, i) => (
+            <div key={i} className="flex items-center gap-1">
+              {typeArr.map((type) => (
+                <TypeBadge key={type} type={type} lang={lang} />
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -130,14 +167,9 @@ const ResultSection = ({ title, types, multiplier, lang, isDark }) => {
 
 export default function App() {
   const [lang, setLang] = useState('ja');
-  const [isDark, setIsDark] = useState(true);
   const [mode, setMode] = useState('attack');
   const [selectedType1, setSelectedType1] = useState(null);
   const [selectedType2, setSelectedType2] = useState(null);
-
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark', isDark);
-  }, [isDark]);
 
   const texts = {
     ja: {
@@ -245,33 +277,23 @@ export default function App() {
   };
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${isDark ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
+    <div className="min-h-screen bg-gray-900 text-white">
       {/* ヘッダー */}
-      <header className={`${isDark ? 'bg-gray-800' : 'bg-white'} shadow-lg sticky top-0 z-10`}>
+      <header className="bg-gray-800 border-b border-gray-700 sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl font-black tracking-tight">
+              <h1 className="text-xl font-bold tracking-tight text-blue-400">
                 {t.title}
               </h1>
-              <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{t.subtitle}</p>
+              <p className="text-xs text-gray-500">{t.subtitle}</p>
             </div>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setLang(lang === 'ja' ? 'en' : 'ja')}
-                className={`px-3 py-1 rounded-full text-sm font-bold transition-colors ${
-                  isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'
-                }`}
+                className="px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-700 hover:bg-gray-600 text-gray-300 transition-colors"
               >
                 {lang === 'ja' ? 'EN' : 'JA'}
-              </button>
-              <button
-                onClick={() => setIsDark(!isDark)}
-                className={`p-2 rounded-full transition-colors ${
-                  isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'
-                }`}
-              >
-                {isDark ? '☀️' : '🌙'}
               </button>
             </div>
           </div>
@@ -280,13 +302,13 @@ export default function App() {
 
       <main className="max-w-4xl mx-auto px-4 py-6">
         {/* モード切り替え */}
-        <div className={`flex rounded-lg overflow-hidden mb-6 ${isDark ? 'bg-gray-800' : 'bg-white'} shadow`}>
+        <div className="flex rounded-lg overflow-hidden mb-6 bg-gray-800 border border-gray-700">
           <button
             onClick={() => { setMode('attack'); setSelectedType2(null); }}
             className={`flex-1 py-3 font-bold transition-colors ${
               mode === 'attack'
-                ? 'bg-red-600 text-white'
-                : isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-900'
+                ? 'bg-blue-600 text-white'
+                : 'text-gray-400 hover:text-white hover:bg-gray-750'
             }`}
           >
             ⚔️ {t.attack}
@@ -296,7 +318,7 @@ export default function App() {
             className={`flex-1 py-3 font-bold transition-colors ${
               mode === 'defense'
                 ? 'bg-blue-600 text-white'
-                : isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-900'
+                : 'text-gray-400 hover:text-white hover:bg-gray-750'
             }`}
           >
             🛡️ {t.defense}
@@ -304,25 +326,23 @@ export default function App() {
         </div>
 
         {/* タイプ選択 */}
-        <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl p-4 shadow mb-6`}>
+        <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 mb-6">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="font-bold">{t.selectType}</h2>
+            <h2 className="font-bold text-gray-200">{t.selectType}</h2>
             {selectedType1 && (
               <button
                 onClick={clearSelection}
-                className={`text-sm px-3 py-1 rounded-full ${
-                  isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'
-                }`}
+                className="text-sm px-3 py-1 rounded-lg bg-gray-700 hover:bg-gray-600 text-gray-300 transition-colors"
               >
                 {t.clear}
               </button>
             )}
           </div>
-          <p className={`text-sm mb-3 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+          <p className="text-sm mb-4 text-gray-500">
             {mode === 'attack' ? t.attackDesc : t.defenseDesc}
           </p>
           
-          <div className="flex flex-wrap gap-2 mb-4">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 mb-4">
             {TYPE_KEYS.map(type => (
               <TypeButton
                 key={type}
@@ -335,12 +355,12 @@ export default function App() {
           </div>
           
           {mode === 'defense' && selectedType1 && (
-            <>
-              <h3 className={`font-bold mb-2 text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+            <div className="mt-4 pt-4 border-t border-gray-700">
+              <h3 className="font-medium mb-3 text-sm text-gray-400">
                 {t.selectType2}
               </h3>
-              <div className="flex flex-wrap gap-2">
-                {TYPE_KEYS.filter(t => t !== selectedType1).map(type => (
+              <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                {TYPE_KEYS.filter(tp => tp !== selectedType1).map(type => (
                   <TypeButton
                     key={type}
                     type={type}
@@ -351,44 +371,43 @@ export default function App() {
                   />
                 ))}
               </div>
-            </>
+            </div>
           )}
         </div>
 
         {/* 結果 */}
         {selectedType1 && (
-          <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl p-4 shadow mb-6`}>
-            <h2 className="font-bold mb-4">{t.results}</h2>
+          <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 mb-6">
+            <h2 className="font-bold mb-4 text-gray-200">{t.results}</h2>
             
-            <ResultSection title={t.ultraEffective} types={results.x4} multiplier={4} lang={lang} isDark={isDark} />
-            <ResultSection title={t.superEffective} types={results.x2} multiplier={2} lang={lang} isDark={isDark} />
-            <ResultSection title={t.notVeryEffective} types={results.x05} multiplier={0.5} lang={lang} isDark={isDark} />
-            <ResultSection title={t.reallyNotEffective} types={results.x025} multiplier={0.25} lang={lang} isDark={isDark} />
-            <ResultSection title={t.noEffect} types={results.x0} multiplier={0} lang={lang} isDark={isDark} />
+            <ResultSection title={t.ultraEffective} types={results.x4} multiplier={4} lang={lang} />
+            <ResultSection title={t.superEffective} types={results.x2} multiplier={2} lang={lang} />
+            <ResultSection title={t.notVeryEffective} types={results.x05} multiplier={0.5} lang={lang} />
+            <ResultSection title={t.reallyNotEffective} types={results.x025} multiplier={0.25} lang={lang} />
+            <ResultSection title={t.noEffect} types={results.x0} multiplier={0} lang={lang} />
           </div>
         )}
 
         {/* 広告スペース */}
-        <div className={`${isDark ? 'bg-gray-800/50' : 'bg-gray-200/50'} rounded-xl p-4 mb-6 text-center`}>
-          {/* AdSense広告コードをここに挿入 */}
-          <div className="py-8 text-gray-400 text-sm">
-            {/* 広告スペース */}
+        <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-4 mb-6 text-center">
+          <div className="py-6 text-gray-600 text-sm">
+            {/* AdSense広告コードをここに挿入 */}
           </div>
         </div>
       </main>
 
       {/* フッター */}
-      <footer className={`border-t ${isDark ? 'border-gray-800' : 'border-gray-200'} py-6`}>
+      <footer className="border-t border-gray-800 py-6">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <a 
             href="https://kumalabos.com" 
             target="_blank" 
             rel="noopener noreferrer"
-            className={`text-sm ${isDark ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'}`}
+            className="text-sm text-gray-500 hover:text-gray-300 transition-colors"
           >
             {t.poweredBy}
           </a>
-          <p className={`text-xs mt-2 ${isDark ? 'text-gray-600' : 'text-gray-400'}`}>
+          <p className="text-xs mt-2 text-gray-600">
             © 2026 kumalabos.com
           </p>
         </div>
